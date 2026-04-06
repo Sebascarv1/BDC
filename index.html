@@ -465,7 +465,6 @@
       background: rgba(0,0,0,.62);
       backdrop-filter: blur(2px);
     }
-    .cardModal{ padding:0; }
     .cardPaper{
       position:relative;
       width: 100%;
@@ -480,7 +479,7 @@
       position:absolute;
       top: 14px;
       right: 14px;
-      z-index: 5;
+      z-index: 6;
       appearance:none;
       border:0;
       border-radius: 12px;
@@ -495,7 +494,35 @@
       letter-spacing:.2px;
     }
 
-    /* Content area aligned to the blank space of cards.png (MOVED DOWN) */
+    /* Music button inside the card */
+    .musicBtn{
+      position:absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 6;
+
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 999px;
+
+      display:grid;
+      place-items:center;
+
+      appearance:none;
+      border:1px solid rgba(35,22,11,.18);
+      cursor:pointer;
+
+      background: linear-gradient(180deg, rgba(255,213,110,.92), rgba(241,178,42,.90));
+      box-shadow: 0 10px 18px rgba(0,0,0,.22);
+
+      font-family: "Playfair Display", ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-weight: 900;
+      color:#1b120a;
+    }
+    .musicBtn:active{ transform: translateY(1px); }
+
+    /* Content area aligned to the blank space of cards.png */
     .cardContent{
       position:absolute;
       left: 10%;
@@ -511,7 +538,6 @@
       padding: 6px;
     }
 
-    /* Image: responsive + capped height so it doesn't dominate */
     #modalImg{
       width:100%;
       height: auto;
@@ -595,14 +621,11 @@
       }
 
       .progressText{ min-width: 84px; }
-
       .actions button{ flex: 1 1 140px; }
 
-      /* Card modal sizing on phones */
       dialog#modal{ width: min(92vw, 520px); }
       .cardPaper{ border-radius: 14px; }
 
-      /* Move content slightly more DOWN on small screens too */
       .cardContent{
         left: 9%;
         right: 9%;
@@ -619,6 +642,13 @@
         padding: 8px 10px;
         border-radius: 10px;
         font-size: 13px;
+      }
+
+      .musicBtn{
+        top: 10px;
+        left: 10px;
+        width: 42px;
+        height: 42px;
       }
     }
 
@@ -737,7 +767,7 @@
             </div>
 
             <div class="footerHint" id="sideMeta">
-              Tip: Add your own images by making an <b>images/</b> folder and using <code>img: "images/step1.jpg"</code>.
+              Music: opens cards will try to play. On phones you might need to tap ▶ once (browser rule).
             </div>
           </div>
         </aside>
@@ -749,6 +779,10 @@
   <dialog id="modal">
     <div class="cardModal">
       <div class="cardPaper">
+        <button class="musicBtn" id="musicBtn" aria-label="Toggle music" title="Play / Pause music">
+          <span id="musicIcon">▶</span>
+        </button>
+
         <button class="cardClose" id="modalClose" aria-label="Close">Close</button>
 
         <div class="cardContent">
@@ -760,12 +794,20 @@
     </div>
   </dialog>
 
+  <!-- Background music (same folder: music.mp3) -->
+  <audio id="bgMusic" preload="auto" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
   <script>
-    const QUEST = [
-      {
-        title: "Dispatch I — A Birthday Most Notable",
-        desc: "A most delicious piece of news has reached my ears…",
-        hint:
+   /***************
+ * Lady Whistledown-style dispatches + images
+ ***************/
+const QUEST = [
+  {
+    title: "Dispatch I — A Birthday Most Notable",
+    desc: "A most delicious piece of news has reached my ears…",
+    hint:
 `Dearest gentle reader,
 
 Today is a day of great consequence. Twenty-seven years ago, the most enchanting person entered this world—yes, YOU.
@@ -774,14 +816,14 @@ And because such an event cannot pass without spectacle… I have arranged a lit
 Our first destination? The City of Love.
 Riddle: Seek the place where one prepares to be irresistible—where sweet scents and romance are kept.
 Look closely. A note awaits you (behind / under / inside).`,
-        img: "https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D4F0FF9039B8DB7A9829C43342ACAFDEF82475D63121D520655A4FC246A1D0B2/scale?aspectRatio=1.78&format=jpeg",
-        icon: "🕯️",
-        x: 12, y: 90
-      },
-      {
-        title: "Dispatch II — Where Dreams Dare to Bloom",
-        desc: "A lady’s dreams, when properly encouraged, can become reality.",
-        hint:
+    img: "https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D4F0FF9039B8DB7A9829C43342ACAFDEF82475D63121D520655A4FC246A1D0B2/scale?aspectRatio=1.78&format=jpeg",
+    icon: "🕯️",
+    x: 12, y: 90
+  },
+  {
+    title: "Dispatch II — Where Dreams Dare to Bloom",
+    desc: "A lady’s dreams, when properly encouraged, can become reality.",
+    hint:
 `Dearest gentle reader,
 
 It is whispered that there exists a place where dreams come true…
@@ -790,14 +832,14 @@ where one may become a princess for an evening—if only one knows where to look
 Riddle: Find the realm where a lady’s finishing touches live:
 where beauty is kept, and confidence is polished.
 Search near your magic (makeup, skincare, mirror, vanity). The next clue is hiding there.`,
-        img: "https://tucuentofavorito.com/wp-content/uploads/2021/09/Bella-durmiente.jpg",
-        icon: "👑",
-        x: 30, y: 72
-      },
-      {
-        title: "Dispatch III — An Appetite for Adventure",
-        desc: "Even the boldest heroine cannot conquer the world on an empty stomach.",
-        hint:
+    img: "https://tucuentofavorito.com/wp-content/uploads/2021/09/Bella-durmiente.jpg",
+    icon: "👑",
+    x: 30, y: 72
+  },
+  {
+    title: "Dispatch III — An Appetite for Adventure",
+    desc: "Even the boldest heroine cannot conquer the world on an empty stomach.",
+    hint:
 `Dearest gentle reader,
 
 After so much intrigue, one must eat—lest the drama become fainting in the drawing room.
@@ -806,14 +848,14 @@ Our expedition now turns… to provisions.
 Riddle: Go where snacks are guarded and cravings are soothed.
 Near your favorite treat, a secret message has been placed.
 (Should you hear wrappers, do keep your composure.)`,
-        img: "https://media.timeout.com/images/105552011/image.jpg",
-        icon: "🍰",
-        x: 46, y: 56
-      },
-      {
-        title: "Dispatch IV — The Night’s Invitation",
-        desc: "The day may end, but a celebration is never truly finished.",
-        hint:
+    img: "https://media.timeout.com/images/105552011/image.jpg",
+    icon: "🍰",
+    x: 46, y: 56
+  },
+  {
+    title: "Dispatch IV — The Night’s Invitation",
+    desc: "The day may end, but a celebration is never truly finished.",
+    hint:
 `Dearest gentle reader,
 
 A dreamed day comes to an end… but not before we go out and celebrate properly.
@@ -822,14 +864,14 @@ The city lights are calling, and the next clue is already impatient.
 Riddle: Seek the place where departures begin:
 where keys rest, shoes wait, or coats hang like sleepy bats.
 Look there for your next dispatch.`,
-        img: "https://offloadmedia.feverup.com/parissecret.com/wp-content/uploads/2019/11/23142005/shangri-la-hotel-paris-bar-botaniste-skiss-21.jpg",
-        icon: "🌙",
-        x: 68, y: 42
-      },
-      {
-        title: "Dispatch V — The Age of Twenty-Seven (and a Treasure Revealed)",
-        desc: "A final page… and an even finer reward.",
-        hint:
+    img: "https://offloadmedia.feverup.com/parissecret.com/wp-content/uploads/2019/11/23142005/shangri-la-hotel-paris-bar-botaniste-skiss-21.jpg",
+    icon: "🌙",
+    x: 68, y: 42
+  },
+  {
+    title: "Dispatch V — The Age of Twenty-Seven (and a Treasure Revealed)",
+    desc: "A final page… and an even finer reward.",
+    hint:
 `Dearest gentle reader,
 
 It is official: you are twenty-seven.
@@ -841,228 +883,319 @@ Look underneath / behind it… where a treasure would be safest kept.
 
 You have unlocked the treasure. Yours truly,
 Lady Whistledown ❤️`,
-        img: "https://img.freepik.com/premium-photo/birthday-cake-number-27-stars-sky-moon-concept-blue-candle-is-fire-by-lighter-copy-space-right-side-screen-close-up_197941-445.jpg",
-        icon: "💌",
-        x: 86, y: 22
-      }
-    ];
+    img: "https://img.freepik.com/premium-photo/birthday-cake-number-27-stars-sky-moon-concept-blue-candle-is-fire-by-lighter-copy-space-right-side-screen-close-up_197941-445.jpg",
+    icon: "💌",
+    x: 86, y: 22
+  }
+];
 
-    const STORAGE_KEY = "whistledown-diary-progress-v2";
+/***************
+ * Persistence
+ ***************/
+const STORAGE_KEY = "whistledown-diary-progress-v2";
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return { done: Array(QUEST.length).fill(false) };
+    const parsed = JSON.parse(raw);
+    if(!parsed || !Array.isArray(parsed.done)) throw new Error("bad state");
+    const done = Array(QUEST.length).fill(false);
+    parsed.done.slice(0, QUEST.length).forEach((v,i)=> done[i]=!!v);
+    return { done };
+  }catch{
+    return { done: Array(QUEST.length).fill(false) };
+  }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
 
-    function loadState(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return { done: Array(QUEST.length).fill(false) };
-        const parsed = JSON.parse(raw);
-        if(!parsed || !Array.isArray(parsed.done)) throw new Error("bad state");
-        const done = Array(QUEST.length).fill(false);
-        parsed.done.slice(0, QUEST.length).forEach((v,i)=> done[i]=!!v);
-        return { done };
-      }catch{
-        return { done: Array(QUEST.length).fill(false) };
-      }
-    }
-    function saveState(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
+let state = loadState();
+let selectedIndex = null;
 
-    let state = loadState();
-    let selectedIndex = null;
+const el = (id)=>document.getElementById(id);
+const mapCanvas = el("mapCanvas");
+const progressBar = el("progressBar");
+const progressText = el("progressText");
+const statusText = el("statusText");
 
-    const el = (id)=>document.getElementById(id);
-    const mapCanvas = el("mapCanvas");
-    const progressBar = el("progressBar");
-    const progressText = el("progressText");
-    const statusText = el("statusText");
+const sideTitle = el("sideTitle");
+const sideDesc  = el("sideDesc");
+const sideHint  = el("sideHint");
+const sideMeta  = el("sideMeta");
+const sideMetaTop = el("sideMetaTop");
 
-    const sideTitle = el("sideTitle");
-    const sideDesc  = el("sideDesc");
-    const sideHint  = el("sideHint");
-    const sideMeta  = el("sideMeta");
-    const sideMetaTop = el("sideMetaTop");
+const btnMarkDone = el("btnMarkDone");
+const btnUnmark   = el("btnUnmark");
+const btnReset    = el("btnReset");
 
-    const btnMarkDone = el("btnMarkDone");
-    const btnUnmark   = el("btnUnmark");
-    const btnReset    = el("btnReset");
+const modal = el("modal");
+const modalDesc  = el("modalDesc");
+const modalHint  = el("modalHint");
+const modalImg   = el("modalImg");
+const modalClose = el("modalClose");
 
-    const modal = el("modal");
-    const modalDesc  = el("modalDesc");
-    const modalHint  = el("modalHint");
-    const modalImg   = el("modalImg");
-    const modalClose = el("modalClose");
+/***************
+ * Music (music.mp3 in same folder)
+ ***************/
+const bgMusic = el("bgMusic");
+const musicBtn = el("musicBtn");
+const musicIcon = el("musicIcon");
 
-    function firstLockedIndex(){
-      return state.done.findIndex(v => !v);
-    }
+function updateMusicIcon(){
+  if(!musicIcon || !bgMusic) return;
+  musicIcon.textContent = (!bgMusic.paused) ? "⏸" : "▶";
+}
 
-    function isRevealed(i){
-      const lockAt = firstLockedIndex();
-      if(lockAt === -1) return true;
-      return i <= lockAt;
-    }
+async function tryAutoPlayMusic(){
+  if(!bgMusic) return;
+  bgMusic.volume = 0.35;
+  try{
+    await bgMusic.play();
+  }catch{
+    // Autoplay can be blocked on mobile until user taps.
+  }finally{
+    updateMusicIcon();
+  }
+}
 
-    function countDone(){
-      return state.done.filter(Boolean).length;
-    }
+async function toggleMusic(){
+  if(!bgMusic) return;
+  if(bgMusic.paused){
+    try{
+      await bgMusic.play();
+    }catch{}
+  }else{
+    bgMusic.pause();
+  }
+  updateMusicIcon();
+}
 
-    function updateProgressUI(){
-      const done = countDone();
-      const total = QUEST.length;
+function stopMusic(){
+  if(!bgMusic) return;
+  bgMusic.pause();
+  bgMusic.currentTime = 0; // remove this line if you prefer to resume instead of restart
+  updateMusicIcon();
+}
 
-      progressText.textContent = `${done}/${total}`;
-      progressBar.style.width = `${(done/total)*100}%`;
+if(musicBtn){
+  musicBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleMusic();
+  });
+}
 
-      if(done === total){
-        statusText.textContent = "Treasure revealed ✨";
-        sideMetaTop.textContent = "One might say… you’ve won the season.";
-      } else {
-        statusText.textContent = `Next: Dispatch ${firstLockedIndex()+1}`;
-        sideMetaTop.textContent = "Proceed carefully… the next clue is most tempting.";
-      }
+if(bgMusic){
+  bgMusic.addEventListener("play", updateMusicIcon);
+  bgMusic.addEventListener("pause", updateMusicIcon);
+  bgMusic.addEventListener("ended", updateMusicIcon);
+}
 
-      const line = document.getElementById("pathLine");
-      const revealedCount = (firstLockedIndex() === -1) ? total : (firstLockedIndex()+1);
-      const t = revealedCount / total;
-      line.style.opacity = String(0.55 + t*0.45);
-      line.style.strokeDasharray = (t > 0.6) ? "5 9" : "4 11";
-    }
+/***************
+ * Quest logic
+ ***************/
+function firstLockedIndex(){
+  return state.done.findIndex(v => !v);
+}
 
-    function renderPins(){
-      [...mapCanvas.querySelectorAll(".pin")].forEach(n => n.remove());
+function isRevealed(i){
+  const lockAt = firstLockedIndex();
+  if(lockAt === -1) return true;
+  return i <= lockAt;
+}
 
-      QUEST.forEach((step, i) => {
-        const pin = document.createElement("button");
-        pin.className = "pin";
-        pin.type = "button";
-        pin.style.left = step.x + "%";
-        pin.style.top  = step.y + "%";
-        pin.setAttribute("aria-label", step.title);
+function countDone(){
+  return state.done.filter(Boolean).length;
+}
 
-        const emoji = document.createElement("div");
-        emoji.className = "emoji";
-        emoji.textContent = step.icon || "📍";
+function updateProgressUI(){
+  const done = countDone();
+  const total = QUEST.length;
 
-        const num = document.createElement("div");
-        num.className = "num";
-        num.textContent = (i+1);
+  progressText.textContent = `${done}/${total}`;
+  progressBar.style.width = `${(done/total)*100}%`;
 
-        pin.appendChild(emoji);
-        pin.appendChild(num);
+  if(done === total){
+    statusText.textContent = "Treasure revealed ✨";
+    sideMetaTop.textContent = "One might say… you’ve won the season.";
+  } else {
+    statusText.textContent = `Next: Dispatch ${firstLockedIndex()+1}`;
+    sideMetaTop.textContent = "Proceed carefully… the next clue is most tempting.";
+  }
 
-        const revealed = isRevealed(i);
-        const done = state.done[i];
+  const line = document.getElementById("pathLine");
+  const revealedCount = (firstLockedIndex() === -1) ? total : (firstLockedIndex()+1);
+  const t = revealedCount / total;
+  if(line){
+    line.style.opacity = String(0.55 + t*0.45);
+    line.style.strokeDasharray = (t > 0.6) ? "5 9" : "4 11";
+  }
+}
 
-        if(!revealed) pin.classList.add("locked");
-        if(done) pin.classList.add("done");
+function renderPins(){
+  [...mapCanvas.querySelectorAll(".pin")].forEach(n => n.remove());
 
-        pin.addEventListener("click", () => {
-          if(!isRevealed(i)) return;
-          selectStep(i);
-          openModal(i);
-        });
+  QUEST.forEach((step, i) => {
+    const pin = document.createElement("button");
+    pin.className = "pin";
+    pin.type = "button";
+    pin.style.left = step.x + "%";
+    pin.style.top  = step.y + "%";
+    pin.setAttribute("aria-label", step.title);
 
-        mapCanvas.appendChild(pin);
-      });
-    }
+    const emoji = document.createElement("div");
+    emoji.className = "emoji";
+    emoji.textContent = step.icon || "📍";
 
-    function selectStep(i){
-      selectedIndex = i;
-      const step = QUEST[i];
-      const revealed = isRevealed(i);
-      const done = state.done[i];
+    const num = document.createElement("div");
+    num.className = "num";
+    num.textContent = (i+1);
 
-      sideTitle.textContent = step.title;
-      sideDesc.textContent  = step.desc;
-      sideHint.textContent  = revealed ? step.hint : "This dispatch remains sealed… for now.";
+    pin.appendChild(emoji);
+    pin.appendChild(num);
 
-      sideMeta.textContent = `Status: ${done ? "Done ✅" : "Not done"} • Revealed: ${revealed ? "Yes" : "No"}`;
+    const revealed = isRevealed(i);
+    const done = state.done[i];
 
-      btnMarkDone.disabled = !revealed || done;
-      btnUnmark.disabled = !revealed || !done;
-    }
+    if(!revealed) pin.classList.add("locked");
+    if(done) pin.classList.add("done");
 
-    function openModal(i){
-      const step = QUEST[i];
-      modalDesc.textContent  = step.desc;
-      modalHint.textContent  = step.hint;
-
-      if(step.img){
-        modalImg.src = step.img;
-        modalImg.alt = step.title;
-        modalImg.style.display = "";
-      } else {
-        modalImg.removeAttribute("src");
-        modalImg.alt = "";
-        modalImg.style.display = "none";
-      }
-
-      modal.showModal();
-    }
-
-    modalClose.addEventListener("click", () => modal.close());
-    modal.addEventListener("click", (e) => {
-      const rect = modal.getBoundingClientRect();
-      const inDialog = rect.top <= e.clientY && e.clientY <= rect.bottom &&
-                       rect.left <= e.clientX && e.clientX <= rect.right;
-      if(!inDialog) modal.close();
+    pin.addEventListener("click", () => {
+      if(!isRevealed(i)) return;
+      selectStep(i);
+      openModal(i);
     });
 
-    btnMarkDone.addEventListener("click", () => {
-      if(selectedIndex == null) return;
-      if(!isRevealed(selectedIndex)) return;
+    mapCanvas.appendChild(pin);
+  });
+}
 
-      state.done[selectedIndex] = true;
-      saveState();
-      renderPins();
-      updateProgressUI();
+function selectStep(i){
+  selectedIndex = i;
+  const step = QUEST[i];
+  const revealed = isRevealed(i);
+  const done = state.done[i];
 
-      const next = firstLockedIndex();
-      if(next !== -1) selectStep(next);
-      else selectStep(selectedIndex);
+  sideTitle.textContent = step.title;
+  sideDesc.textContent  = step.desc;
+  sideHint.textContent  = revealed ? step.hint : "This dispatch remains sealed… for now.";
 
-      if(countDone() === QUEST.length){
-        setTimeout(() => alert("Dearest gentle reader… the treasure is yours. ❤️"), 200);
-      }
-    });
+  sideMeta.textContent = `Status: ${done ? "Done ✅" : "Not done"} • Revealed: ${revealed ? "Yes" : "No"}`;
 
-    btnUnmark.addEventListener("click", () => {
-      if(selectedIndex == null) return;
-      if(!isRevealed(selectedIndex)) return;
+  btnMarkDone.disabled = !revealed || done;
+  btnUnmark.disabled = !revealed || !done;
+}
 
-      state.done[selectedIndex] = false;
-      saveState();
-      renderPins();
-      updateProgressUI();
-      selectStep(selectedIndex);
-    });
+function openModal(i){
+  const step = QUEST[i];
+  modalDesc.textContent  = step.desc;
+  modalHint.textContent  = step.hint;
 
-    btnReset.addEventListener("click", () => {
-      const ok = confirm("Reset the dispatches? (This will lock them again.)");
-      if(!ok) return;
+  if(step.img){
+    modalImg.src = step.img;
+    modalImg.alt = step.title;
+    modalImg.style.display = "";
+  } else {
+    modalImg.removeAttribute("src");
+    modalImg.alt = "";
+    modalImg.style.display = "none";
+  }
 
-      state = { done: Array(QUEST.length).fill(false) };
-      saveState();
-      selectedIndex = null;
+  modal.showModal();
 
-      renderPins();
-      updateProgressUI();
+  // Start music when opening the card (may require user gesture on mobile)
+  tryAutoPlayMusic();
+}
 
-      sideTitle.textContent = "A Blank Page…";
-      sideDesc.textContent = "Begin with Dispatch I. Mark it done to reveal the next dispatch upon the map.";
-      sideHint.textContent = "No dispatch selected yet.";
-      sideMeta.textContent = "Tip: Add your own images by making an images/ folder and using img: \"images/step1.jpg\".";
-      sideMetaTop.textContent = "The ton awaits your next move…";
+/***************
+ * Modal close => STOP MUSIC
+ ***************/
+modalClose.addEventListener("click", () => {
+  modal.close();
+  stopMusic();
+});
 
-      btnMarkDone.disabled = true;
-      btnUnmark.disabled = true;
-    });
+// click outside
+modal.addEventListener("click", (e) => {
+  const rect = modal.getBoundingClientRect();
+  const inDialog = rect.top <= e.clientY && e.clientY <= rect.bottom &&
+                   rect.left <= e.clientX && e.clientX <= rect.right;
+  if(!inDialog){
+    modal.close();
+    stopMusic();
+  }
+});
 
-    // Initial
-    renderPins();
-    updateProgressUI();
-    const first = firstLockedIndex();
-    if(first !== -1) selectStep(first);
-    else selectStep(QUEST.length - 1);
+// ESC / any close
+modal.addEventListener("close", () => {
+  stopMusic();
+});
+
+/***************
+ * Done/Undo/Reset
+ ***************/
+btnMarkDone.addEventListener("click", () => {
+  if(selectedIndex == null) return;
+  if(!isRevealed(selectedIndex)) return;
+
+  state.done[selectedIndex] = true;
+  saveState();
+  renderPins();
+  updateProgressUI();
+
+  const next = firstLockedIndex();
+  if(next !== -1) selectStep(next);
+  else selectStep(selectedIndex);
+
+  if(countDone() === QUEST.length){
+    setTimeout(() => alert("Dearest gentle reader… the treasure is yours. ❤️"), 200);
+  }
+});
+
+btnUnmark.addEventListener("click", () => {
+  if(selectedIndex == null) return;
+  if(!isRevealed(selectedIndex)) return;
+
+  state.done[selectedIndex] = false;
+  saveState();
+  renderPins();
+  updateProgressUI();
+  selectStep(selectedIndex);
+});
+
+btnReset.addEventListener("click", () => {
+  const ok = confirm("Reset the dispatches? (This will lock them again.)");
+  if(!ok) return;
+
+  state = { done: Array(QUEST.length).fill(false) };
+  saveState();
+  selectedIndex = null;
+
+  renderPins();
+  updateProgressUI();
+
+  sideTitle.textContent = "A Blank Page…";
+  sideDesc.textContent = "Begin with Dispatch I. Mark it done to reveal the next dispatch upon the map.";
+  sideHint.textContent = "No dispatch selected yet.";
+  sideMeta.textContent = "Music: opens cards will try to play. On phones you might need to tap ▶ once.";
+  sideMetaTop.textContent = "The ton awaits your next move…";
+
+  btnMarkDone.disabled = true;
+  btnUnmark.disabled = true;
+
+  // If reset happens while music is playing
+  stopMusic();
+});
+
+/***************
+ * Initial
+ ***************/
+renderPins();
+updateProgressUI();
+const first = firstLockedIndex();
+if(first !== -1) selectStep(first);
+else selectStep(QUEST.length - 1);
+updateMusicIcon();
   </script>
 </body>
 </html>
