@@ -24,10 +24,7 @@
       --gold1:#f3c25a;
       --gold2:#c47a1a;
 
-      --seal:#8b1010;
-
       --shadow: rgba(0,0,0,.22);
-      --paperShadow: rgba(0,0,0,.18);
       --edge: rgba(80,50,20,.28);
     }
 
@@ -133,6 +130,25 @@
       background:
         radial-gradient(900px 600px at 20% 20%, rgba(255,220,140,.10), transparent 70%),
         linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+      position: relative;
+    }
+
+    /* book spine between pages (desktop) */
+    .spine{
+      position:absolute;
+      top:18px; bottom:18px;
+      left:50%;
+      width: 16px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.08));
+      box-shadow: inset 0 0 12px rgba(0,0,0,.22);
+      opacity:.35;
+      pointer-events:none;
+      display:none;
+      border-radius: 10px;
+    }
+    @media (min-width: 981px){
+      .spine{ display:block; }
     }
 
     /* Page styling */
@@ -189,22 +205,20 @@
       gap:12px;
     }
 
-    /* book spine between pages (desktop) */
-    .spine{
+    /* Decorative corners */
+    .corner{
       position:absolute;
-      top:0; bottom:0;
-      left:50%;
-      width: 16px;
-      transform: translateX(-50%);
-      background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.08));
-      box-shadow: inset 0 0 12px rgba(0,0,0,.22);
-      opacity:.35;
+      width: 52px; height: 52px;
+      border: 2px solid rgba(35,22,11,.18);
+      border-radius: 12px;
+      opacity:.55;
       pointer-events:none;
-      display:none;
+      z-index: 2;
     }
-    @media (min-width: 981px){
-      .spine{ display:block; }
-    }
+    .corner.tl{ top:12px; left:12px; border-right:0; border-bottom:0; }
+    .corner.tr{ top:12px; right:12px; border-left:0; border-bottom:0; }
+    .corner.bl{ bottom:12px; left:12px; border-right:0; border-top:0; }
+    .corner.br{ bottom:12px; right:12px; border-left:0; border-top:0; }
 
     /* Headings */
     .pageTitle{
@@ -235,37 +249,17 @@
       color: var(--inkSoft);
       line-height:1.35;
     }
-/* Map background image (behind path + pins) */
-#mapCanvas{
-  background-image:
-    url("background.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 
-  /* keep existing shape + border */
-  border-radius: 14px;
-  border: 1px dashed rgba(60,40,20,.35);
-  overflow: hidden;
-  position: relative;
-  flex: 1;
-  min-height: 470px;
-}
-}
-
-    /* Decorative corners */
-    .corner{
-      position:absolute;
-      width: 52px; height: 52px;
-      border: 2px solid rgba(35,22,11,.18);
-      border-radius: 12px;
-      opacity:.55;
-      pointer-events:none;
+    /* ===== Map Canvas (use background.png) ===== */
+    #mapCanvas{
+      position:relative;
+      flex: 1;
+      min-height: 470px;
+      border-radius: 14px;
+      border: 1px dashed rgba(60,40,20,.35);
+      overflow: hidden;
+      background: url("background.png") center / cover no-repeat;
     }
-    .corner.tl{ top:12px; left:12px; border-right:0; border-bottom:0; }
-    .corner.tr{ top:12px; right:12px; border-left:0; border-bottom:0; }
-    .corner.bl{ bottom:12px; left:12px; border-right:0; border-top:0; }
-    .corner.br{ bottom:12px; right:12px; border-left:0; border-top:0; }
 
     /* Path */
     svg.path{
@@ -377,7 +371,7 @@
       color: var(--inkSoft);
     }
 
-    /* Right page: diary entry card */
+    /* Right page */
     .entryTitle{
       margin:0;
       font-family: "Playfair Display", ui-serif, Georgia, "Times New Roman", Times, serif;
@@ -449,9 +443,7 @@
       margin-top:12px;
       flex-wrap:wrap;
     }
-    .actions button{
-      flex: 1 1 170px;
-    }
+    .actions button{ flex: 1 1 170px; }
 
     .footerHint{
       margin-top:auto;
@@ -461,100 +453,187 @@
       line-height:1.35;
     }
 
-    /* Modal */
-    dialog{
+    /* ===== Card-style modal using cards.png ===== */
+    dialog#modal{
       border:0;
-      border-radius: 16px;
       padding:0;
-      width:min(640px, 92vw);
-      box-shadow: 0 34px 110px rgba(0,0,0,.55);
-      overflow:hidden;
-      background: #2a1708;
-      color:#fff;
-      border:1px solid rgba(255,220,140,.18);
+      width:min(680px, 94vw);
+      background: transparent;
+      box-shadow:none;
     }
-    dialog::backdrop{
+    dialog#modal::backdrop{
       background: rgba(0,0,0,.62);
       backdrop-filter: blur(2px);
     }
-    .modalHead{
-      padding:14px 14px 10px;
-      border-bottom:1px solid rgba(255,220,140,.16);
-      background: linear-gradient(90deg, rgba(255,220,140,.14), rgba(255,255,255,.02));
+    .cardModal{ padding:0; }
+    .cardPaper{
+      position:relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      border-radius: 16px;
+      overflow:hidden;
+      background: url("cards.png") center / cover no-repeat;
+      box-shadow: 0 34px 110px rgba(0,0,0,.55);
+      border: 1px solid rgba(255,220,140,.18);
     }
-    .modalHead h3{
-      margin:0;
-      font-size:18px;
+    .cardClose{
+      position:absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 5;
+      appearance:none;
+      border:0;
+      border-radius: 12px;
+      padding: 9px 11px;
+      font-weight: 800;
+      cursor:pointer;
+      color:#1b120a;
+      background: linear-gradient(180deg, rgba(255,213,110,.92), rgba(241,178,42,.90));
+      border:1px solid rgba(255,230,170,.55);
+      box-shadow: 0 10px 18px rgba(0,0,0,.22);
       font-family: "Playfair Display", ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-weight:800;
       letter-spacing:.2px;
     }
-    .modalBody{ padding:14px; }
-    .modalBody p{
-      margin:0 0 12px;
-      color: rgba(255,245,220,.88);
+
+    /* Content area aligned to the blank space of cards.png (MOVED DOWN) */
+    .cardContent{
+      position:absolute;
+      left: 10%;
+      right: 10%;
+      top: 44%;
+      bottom: 9%;
+
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+
+      overflow:auto;
+      padding: 6px;
+    }
+
+    /* Image: responsive + capped height so it doesn't dominate */
+    #modalImg{
+      width:100%;
+      height: auto;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(35,22,11,.16);
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+      background: rgba(0,0,0,.06);
+    }
+
+    #modalDesc{
+      margin: 0;
+      color: rgba(35,22,11,.86);
       font-family: "IM Fell English", ui-serif, Georgia, "Times New Roman", Times, serif;
       font-size: 14px;
       line-height: 1.45;
     }
-    .modalActions{
-      display:flex;
-      gap:10px;
-      padding: 0 14px 14px;
-      justify-content:flex-end;
-    }
-
-    #modalImg{
-      width:100%;
-      height: 270px;
-      object-fit: cover;
-      border-radius: 14px;
-      border: 1px solid rgba(255,220,140,.16);
-      margin-bottom: 12px;
-      box-shadow: 0 12px 26px rgba(0,0,0,.22);
-      background: rgba(0,0,0,.15);
-    }
 
     .modalHint{
-      padding:10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,230,170,.16);
-      background: rgba(0,0,0,.22);
-      color: rgba(255,245,220,.92);
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(35,22,11,.22);
+      background: rgba(255,255,255,.55);
+      color: rgba(35,22,11,.92);
       white-space: pre-wrap;
       font-family: "IM Fell English", ui-serif, Georgia, "Times New Roman", Times, serif;
       line-height: 1.55;
       font-size: 14px;
     }
 
-    .modalBrand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding: 8px 10px;
-  margin-bottom: 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,220,140,.16);
-  background: rgba(0,0,0,.18);
-}
+    .cardContent::-webkit-scrollbar{ width:10px; }
+    .cardContent::-webkit-scrollbar-thumb{
+      background: rgba(35,22,11,.25);
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,.35);
+    }
 
-#modalLogo{
-  width: 46px;
-  height: 46px;
-  object-fit: cover;
-  border-radius: 12px;
-  border: 1px solid rgba(255,220,140,.18);
-  box-shadow: 0 10px 20px rgba(0,0,0,.22);
-}
+    /* =========================
+       Mobile / phone layout fixes
+       ========================= */
+    @media (max-width: 980px){
+      body{
+        padding: 14px;
+        align-items: flex-start;
+      }
+      header{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .controls{
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .book{ padding: 12px; }
+      .spine{ display:none !important; }
+      .wrap{
+        grid-template-columns: 1fr;
+        min-height: auto;
+        gap: 12px;
+      }
+      .page{ border-radius: 16px; }
+      .pageInner{
+        padding: 14px;
+        gap: 10px;
+      }
+      #mapCanvas{ min-height: 360px; }
 
-.modalBrandText{
-  font-family: "Playfair Display", ui-serif, Georgia, "Times New Roman", Times, serif;
-  font-weight: 800;
-  letter-spacing: .2px;
-  color: rgba(255,245,220,.92);
-  line-height: 1.1;
-}
+      .pin{
+        width: 44px;
+        height: 44px;
+        transform: translate(-50%, -105%);
+      }
+      .pin .emoji{ font-size: 18px; }
+      .pin .num{
+        width: 21px;
+        height: 21px;
+        font-size: 12px;
+        bottom: -10px;
+      }
 
+      .progressText{ min-width: 84px; }
+
+      .actions button{ flex: 1 1 140px; }
+
+      /* Card modal sizing on phones */
+      dialog#modal{ width: min(92vw, 520px); }
+      .cardPaper{ border-radius: 14px; }
+
+      /* Move content slightly more DOWN on small screens too */
+      .cardContent{
+        left: 9%;
+        right: 9%;
+        top: 46%;
+        bottom: 8%;
+        gap: 9px;
+      }
+
+      #modalImg{ max-height: 140px; }
+
+      .cardClose{
+        top: 10px;
+        right: 10px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 420px){
+      #mapCanvas{ min-height: 320px; }
+      dialog#modal{ width: 94vw; }
+      .cardContent{
+        left: 8%;
+        right: 8%;
+        top: 47%;
+        bottom: 7%;
+      }
+      #modalImg{ max-height: 125px; }
+      .modalHint{ padding: 9px 10px; }
+    }
   </style>
 </head>
 
@@ -666,30 +745,22 @@
     </div>
   </div>
 
+  <!-- Card modal (cards.png background) -->
   <dialog id="modal">
-    <div class="modalHead">
-      <h3 id="modalTitle">Dispatch</h3>
-    </div>
-    <div class="modalBody">
-    <div class="modalBrand">
-        <img id="modalLogo" src="logo.jpg" alt="Logo" />
-        <div class="modalBrandText">Lady Whistledown’s Society Papers</div>
-    </div>
+    <div class="cardModal">
+      <div class="cardPaper">
+        <button class="cardClose" id="modalClose" aria-label="Close">Close</button>
 
-    <img id="modalImg" alt="" />
-    <p id="modalDesc"></p>
-    <div class="modalHint" id="modalHint"></div>
-    </div>
-    <div class="modalActions">
-      <button id="modalClose">Close</button>
+        <div class="cardContent">
+          <img id="modalImg" alt="" />
+          <p id="modalDesc"></p>
+          <div class="modalHint" id="modalHint"></div>
+        </div>
+      </div>
     </div>
   </dialog>
 
   <script>
-    /***************
-     * Lady Whistledown-style dispatches + images
-     * Replace img URLs with your own photos if you want.
-     ***************/
     const QUEST = [
       {
         title: "Dispatch I — A Birthday Most Notable",
@@ -776,10 +847,8 @@ Lady Whistledown ❤️`,
       }
     ];
 
-    /***************
-     * Persistence
-     ***************/
     const STORAGE_KEY = "whistledown-diary-progress-v2";
+
     function loadState(){
       try{
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -817,7 +886,6 @@ Lady Whistledown ❤️`,
     const btnReset    = el("btnReset");
 
     const modal = el("modal");
-    const modalTitle = el("modalTitle");
     const modalDesc  = el("modalDesc");
     const modalHint  = el("modalHint");
     const modalImg   = el("modalImg");
@@ -915,7 +983,6 @@ Lady Whistledown ❤️`,
 
     function openModal(i){
       const step = QUEST[i];
-      modalTitle.textContent = step.title;
       modalDesc.textContent  = step.desc;
       modalHint.textContent  = step.hint;
 
